@@ -1,0 +1,8 @@
+# 作者环境：Python 3.12.10（Windows 11）。下面是作者实际使用的版本
+numpy==2.5.3
+scipy==1.18.1
+soundfile==0.14.0
+matplotlib==3.11.2
+pillow==12.3.0
+playwright==1.63.0
+imageio-ffmpeg==0.6.0

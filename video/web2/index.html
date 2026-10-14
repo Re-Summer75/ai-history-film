@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>从现在看过去 · AI 简史（光粒子版）</title>
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">{"imports": {"three": "../web/vendor/three.module.min.js", "three/addons/": "../web/vendor/addons/"}}</script>
+<script src="../web/vendor/gsap.min.js"></script>
+<script src="../web/vendor/CustomEase.min.js"></script>
+<script src="../web/vendor/SplitText.min.js"></script>
+<script src="../web/vendor/DrawSVGPlugin.min.js"></script>
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl" width="1920" height="1080"></canvas>
+  <div id="scenes"></div>
+  <div id="hud"></div>
+  <div id="flash"></div>
+  <div id="vignette"></div>
+  <div id="fade"></div>
+</div>
+<div id="dev" hidden>
+  <button id="play">▶</button><input id="scrub" type="range" min="0" max="240" step="0.0166667" value="0"><span id="tc">0.00</span>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

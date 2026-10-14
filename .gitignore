@@ -1,0 +1,13 @@
+# 渲染输出（视频分块、截图、音频）
+video/out/
+out/
+*.part.mp4
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# 系统
+Thumbs.db
+.DS_Store

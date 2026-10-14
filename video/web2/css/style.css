@@ -1,0 +1,160 @@
+@font-face { font-family: "Noto Sans SC"; src: url("../../web/fonts/NotoSansSC.ttf") format("truetype"); font-weight: 100 900; font-display: block; }
+@font-face { font-family: "Inter"; src: url("../../web/fonts/Inter.ttf") format("truetype"); font-weight: 100 900; font-display: block; }
+@font-face { font-family: "JetBrains Mono"; src: url("../../web/fonts/JetBrainsMono.ttf") format("truetype"); font-weight: 100 800; font-display: block; }
+
+:root {
+  --fg: #f4efe8; --dim: #8d8a84; --accent: #ff6a2b; --cold: #9cc7ff;
+  --cn: "Noto Sans SC", "Microsoft YaHei", sans-serif; --en: "Inter", "Noto Sans SC", sans-serif; --mono: "JetBrains Mono", Consolas, monospace;
+}
+html, body { margin: 0; background: #000; overflow: hidden; }
+#stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #030305; color: var(--fg); font-family: var(--cn);
+         -webkit-font-smoothing: antialiased; }
+#gl, #scenes, #hud, #flash, #vignette, #fade { position: absolute; inset: 0; }
+#hud { pointer-events: none; }
+#gl { width: 1920px; height: 1080px; }
+#flash { background: #fffaf2; opacity: 0; pointer-events: none; }
+#fade { background: #000; opacity: 0; pointer-events: none; }
+#vignette { pointer-events: none; background: radial-gradient(ellipse 80% 75% at 50% 50%, transparent 55%, rgba(0,0,0,.6) 100%); }
+.scene { position: absolute; inset: 0; visibility: hidden; }
+.abs { position: absolute; }
+
+/* 大字：一次只出现一句，居中，带柔和辉光 */
+.big { position: absolute; left: 0; width: 1920px; text-align: center; white-space: nowrap; will-change: transform, filter, opacity; }
+.num { font-family: var(--en); font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+.glow { text-shadow: 0 0 28px rgba(255, 180, 130, .35), 0 0 80px rgba(255, 106, 43, .18); }
+.glow-cold { text-shadow: 0 0 28px rgba(156, 199, 255, .35), 0 0 80px rgba(120, 170, 255, .2); }
+.kicker { font-family: var(--mono); font-size: 20px; letter-spacing: .5em; text-transform: uppercase; color: var(--dim); }
+.c { display: inline-block; white-space: pre; will-change: transform, filter, opacity; }
+.mono { font-family: var(--mono); }
+.dim { color: var(--dim); }
+.year { font-family: var(--en); font-size: 300px; font-weight: 200; line-height: 1; color: #e2ecff; letter-spacing: 0.02em; }
+.ch { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em; }
+.ch > i { display: inline-block; font-style: normal; }
+
+#dev[hidden] { display: none !important; }
+#dev { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 10px; align-items: center; padding: 8px 12px;
+       background: rgba(20,20,22,.9); color: #ddd; font: 13px var(--mono); z-index: 9; }
+#dev input { flex: 1; }
+
+/* ---------------- 机能标注层 ---------------- */
+.co { position: absolute; left: 0; top: 0; white-space: nowrap; font-family: var(--mono); color: var(--fg); }
+.co-i { color: var(--accent); font-size: 17px; letter-spacing: .12em; margin-right: 12px; vertical-align: middle; }
+.co-t { font-family: var(--mono), var(--cn); font-size: 26px; letter-spacing: .08em; vertical-align: middle; }
+.co-t.acc { color: var(--accent); }
+.co-s { font-size: 17px; letter-spacing: .18em; color: var(--dim); margin-top: 6px; }
+.ro { position: absolute; font-family: var(--mono); color: var(--fg); white-space: nowrap; }
+.ro-l { font-size: 16px; letter-spacing: .28em; color: var(--dim); padding-bottom: 8px; border-bottom: 1px solid rgba(244,239,232,.25); margin-bottom: 8px; }
+.ro-v { font-size: 30px; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+.chap { position: absolute; left: 96px; top: 84px; font-family: var(--mono); color: var(--fg); white-space: nowrap; display: flex; align-items: center; gap: 16px; }
+.chap-n { color: var(--accent); font-size: 17px; letter-spacing: .2em; }
+.chap-l { display: inline-block; height: 1px; background: rgba(244,239,232,.6); }
+.chap-t { font-family: var(--cn); font-size: 24px; letter-spacing: .3em; }
+.chap-s { font-size: 16px; letter-spacing: .3em; color: var(--dim); }
+.tg { position: absolute; left: 0; top: 0; white-space: nowrap; font-family: var(--mono); font-size: 18px; letter-spacing: .18em; color: var(--fg); }
+.tg.dim { color: var(--dim); }
+.tg.acc { color: var(--accent); }
+.tg.cn { font-family: var(--cn); font-size: 28px; letter-spacing: .1em; }
+.tg.cn.sm { font-size: 22px; }
+.tg.big-caret { font-size: 34px; letter-spacing: 0; }
+.tg.rpt { font-family: var(--cn); font-size: 26px; letter-spacing: 0; text-shadow: 0 0 10px rgba(255,106,43,.75); }   /* 猜下一个词：转盘指针 */
+.bars { position: absolute; font-family: var(--mono); color: var(--fg); }
+.bars-h { font-size: 16px; letter-spacing: .26em; color: var(--dim); margin-bottom: 12px; }
+.bars-r { display: flex; align-items: center; gap: 16px; }
+.bars-n { font-family: var(--cn); font-size: 28px; min-width: 84px; letter-spacing: .08em; }
+.bars-t { position: relative; height: 3px; background: rgba(244,239,232,.12); }
+.bars-f { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(244,239,232,.85); }
+.bars-f.acc { background: var(--accent); box-shadow: 0 0 12px rgba(255,106,43,.6); }
+.bars-v { font-size: 26px; min-width: 80px; font-variant-numeric: tabular-nums; }
+.bars-v.acc { color: var(--accent); }
+.big-title { font-family: var(--en); font-style: italic; }
+.tg.tok { font-size: 44px; letter-spacing: .04em; }
+.tg.big-ans { font-size: 38px; letter-spacing: .12em; font-weight: 500; }   /* 注意力：它 = 小猫 / 桌子 */
+.tg.att-w { font-size: 22px; letter-spacing: .06em; }
+
+/* ---------------- 同一个问题，四个时代 ---------------- */
+.ans { position: absolute; left: 460px; top: 432px; width: 1000px; opacity: 0; }
+.ans-tag { font-family: var(--mono); font-size: 20px; letter-spacing: .3em; margin-bottom: 22px; }
+.ans-body { font-family: var(--cn); font-size: 38px; line-height: 1.6; letter-spacing: .04em; font-weight: 300; min-height: 120px; }
+.era-eliza .ans-tag, .era-eliza .ans-body { color: #ffb45c; font-family: var(--mono), var(--cn); }
+.era-gpt2 .ans-tag { color: #9bb3f0; } .era-gpt2 .ans-body { color: #c9d3ec; }
+.era-cgpt .ans-tag { color: #d8cfc4; } .era-cgpt .ans-body { color: #f4efe8; }
+.era-now .ans-tag { color: var(--accent); } .era-now .ans-body { color: #fff7ef; font-weight: 400; }
+.chips { margin-top: 22px; display: flex; gap: 12px; }
+.chip { font-family: var(--cn); font-size: 24px; letter-spacing: .1em; padding: 6px 14px; border: 1px solid rgba(244,239,232,.35); color: var(--fg); opacity: 0; }
+.chip.acc { border-color: var(--accent); color: var(--accent); }
+.tg.yeargate { font-family: var(--en); font-size: 64px; font-weight: 200; letter-spacing: .1em; color: rgba(244,239,232,.85); }
+.tg.draft { font-size: 24px; letter-spacing: .06em; color: rgba(141,138,132,.9); }
+
+/* ---------------- 开场：AI 正在工作 ---------------- */
+.work-label { top: 96px; font-family: var(--mono); font-size: 18px; letter-spacing: .42em; color: var(--dim); }
+.work-clock { top: 124px; font-size: 96px; font-weight: 200; letter-spacing: .04em; }
+.work-step { top: 866px; font-size: 54px; font-weight: 400; letter-spacing: .06em; }
+.work-step b { font-weight: 500; color: #ffd9c2; }
+.work-step .sep { color: var(--dim); margin: 0 .45em; }
+.work-step i { font-style: normal; }
+.work-step .bad { color: #ff5a45; }
+.work-step .ok { color: #7dffa8; }
+.work-prog { position: absolute; left: 50%; top: 962px; transform: translateX(-50%); display: flex; gap: 12px; }
+.work-prog i { display: block; width: 72px; height: 4px; background: rgba(244,239,232,.16); }
+.work-prog i.done { background: rgba(244,239,232,.75); }
+.work-prog i.cur { background: var(--accent); box-shadow: 0 0 12px rgba(255,106,43,.7); }
+
+/* ---------------- 第 1 幕 ---------------- */
+.turing-q { font-size: 44px; letter-spacing: .28em; color: #d8e6ff; }
+.tg.bubble { font-size: 26px; padding: 10px 18px; border: 1px solid rgba(244,239,232,.4); background: rgba(8,9,14,.62); border-radius: 6px; letter-spacing: .06em; }
+.tg.bubble.reply { border-color: rgba(255,106,43,.55); }
+.tg.reveal { font-size: 40px; font-weight: 500; letter-spacing: .08em; }
+
+/* ---------------- 第 2 幕：规模 ---------------- */
+.scale-n { top: 88px; font-size: 118px; font-weight: 200; letter-spacing: .02em; transform-origin: 50% 60%; }
+.scale-n .mult { font-size: 56px; color: var(--accent); margin-left: .5em; font-weight: 400; vertical-align: 40%; }
+.scale-m { top: 232px; font-family: var(--mono), var(--cn); font-size: 26px; letter-spacing: .3em; color: var(--dim); }
+.scale-y { top: 276px; font-size: 34px; font-weight: 300; letter-spacing: .08em; }
+.scale-y b { color: #ffd2b8; font-weight: 500; }
+
+/* ---------------- 第 2 幕：RLHF 的例子 ---------------- */
+.rl-card { position: absolute; box-sizing: border-box; padding: 30px 44px; opacity: 0; }
+.rl-who { font-family: var(--mono), var(--cn); font-size: 20px; letter-spacing: .3em; color: #9bb3f0; margin-bottom: 20px; }
+.rl-card.after .rl-who { color: var(--accent); }
+.rl-q { font-size: 36px; font-weight: 400; letter-spacing: .06em; margin-bottom: 14px; color: #f4efe8; }
+.rl-a { font-size: 34px; font-weight: 300; letter-spacing: .04em; line-height: 1.55; color: #c9d3ec; min-height: 52px; }
+.rl-card.after .rl-a { color: #fff7ef; font-weight: 400; }
+.rl-stamp { position: absolute; right: 44px; top: 26px; font-family: var(--cn); font-size: 28px; font-weight: 500; letter-spacing: .1em; color: #9bb3f0; }
+.rl-card.after .rl-stamp { color: var(--accent); text-shadow: 0 0 18px rgba(255,106,43,.45); }
+.rl-rank { position: absolute; box-sizing: border-box; display: flex; opacity: 0; }
+.rk { flex: 1; box-sizing: border-box; padding: 22px 26px; }
+.rk + .rk { margin-left: 1.9%; }
+.rk-n { font-family: var(--mono); font-size: 20px; letter-spacing: .3em; color: var(--dim); margin-right: 12px; }
+.rk-t { font-size: 26px; font-weight: 300; color: #d8cfc4; }
+.rk-b { display: block; margin-top: 12px; font-size: 28px; font-weight: 500; color: #d8cfc4; min-height: 34px; }
+.rk.best .rk-b, .rk.best .rk-n { color: var(--accent); }
+
+/* ---------------- 第 3 幕：各种提问 ---------------- */
+.tg.bubble.ask { font-size: 24px; padding: 8px 16px; border-color: rgba(255,170,120,.45); background: rgba(12,8,6,.6); }
+
+/* ---------------- 第 4 幕：上下文窗口 ---------------- */
+.ctx-big { top: 150px; font-size: 76px; font-weight: 400; letter-spacing: .1em; }
+.ctx-sub { top: 270px; font-size: 22px; letter-spacing: .4em; color: var(--dim); }
+
+/* ---------------- 第 6 幕：回顾 ---------------- */
+.tg.recap { font-size: 34px; letter-spacing: .08em; }
+
+/* ---------------- 第 3 幕：算力 ---------------- */
+.comp-n { top: 86px; font-size: 120px; font-weight: 200; letter-spacing: .02em; }
+.comp-n sup { font-size: 60px; vertical-align: 70%; margin-left: .06em; color: #ffd2b8; }
+.comp-s { top: 248px; font-size: 32px; font-weight: 300; letter-spacing: .1em; color: var(--fg); }
+
+/* ---------------- 第 4 幕：能力有多强 ---------------- */
+.cap-card { position: absolute; left: 330px; top: 170px; width: 590px; padding: 26px 34px 30px; border: 1px solid rgba(255,106,43,.55);
+            background: rgba(10,8,8,.62); opacity: 0; box-shadow: 0 0 40px rgba(255,106,43,.12); }
+.cap-card.r { left: 1000px; }
+.cap-k { font-size: 22px; letter-spacing: .08em; color: var(--dim); }
+.cap-b { font-size: 64px; font-weight: 500; letter-spacing: .06em; margin: 12px 0 10px; color: #fff3e8; text-shadow: 0 0 28px rgba(255,150,90,.35); }
+.cap-s { font-size: 26px; font-weight: 300; letter-spacing: .06em; color: #ffc9a6; }
+
+/* ---------------- 第 6 幕：数据之城 ---------------- */
+.city-year { top: 70px; font-size: 64px; font-weight: 200; letter-spacing: .22em; color: #f4efe8; text-shadow: 0 0 24px rgba(255, 180, 130, .35); }
+.big.half-l { width: 1000px; }
+
+/* ---------------- 成绩计分板（第 4 幕结尾） ---------------- */
+.tg.cap-num { font-family: var(--en); font-size: 68px; font-weight: 300; letter-spacing: .06em; color: #fff3e8; text-shadow: 0 0 28px rgba(255,150,90,.35); }
